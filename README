@@ -1,0 +1,7 @@
+Requirements: git stow
+	sudo apt install -y git stow
+
+To checkout dotfile:
+	1. Remove any existing dotfiles in your home dir
+	2. cd ~/.dotfiles
+	3. stow [package] (ex. stow bash)

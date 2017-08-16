@@ -1,0 +1,21 @@
+[user]
+	name = Robert Gatti
+	email = robert.gatti@gmail.com
+[core]
+	editor = vim
+	excludesfile = ~/.gitignore_global
+[push]
+	default = simple
+[alias]
+	log-graph = log --graph --first-parent --decorate --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
+	log-graph-all = log --graph --all --decorate --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
+	log-simple = log --oneline --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
+	pp = !sh -c 'git pull && git push'
+	co = checkout
+	br = branch
+	ci = commit -am
+	st = status
+	unstage = reset HEAD --
+	last = log -1 HEAD
+[credential]
+	helper = cache --timeout=1000

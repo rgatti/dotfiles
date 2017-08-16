@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+#
+# A simple PUsh/PUll script that reads in a config file from the current
+# working directory.
+#
+# The config file structure is:
+# HOST=<server name or ip>
+# REMOTE_PATH=<absolute path>
+
+set -o nounset
+set -o pipefail
+set -o errexit
+
+function usage_and_exit() {
+	MSG=${1:-}
+	echo ${MSG}
+	cat <<<-END
+		Usage: pu ACTION FILE
+
+		ACTION  The action take on the file, push or pull.
+		FILE    Relative path to a file.
+	END
+	exit 1
+}
+
+CDIR=$(pwd)
+CONFIG=${CDIR}/.sftp
+
+ACTION=${1:-}
+FILE=${2:-}
+
+# check arguments
+if [ -z ${ACTION} ] || [ -z ${FILE} ]; then
+	usage_and_exit
+fi
+
+# check for the JSON config
+if ! [ -f ${CONFIG} ]; then
+	usage_and_exit "No config found in the current directory: ${CDIR}."
+fi
+
+# include config
+source ${CONFIG}
+
+
+# upload / download the file or if unknown action print help and exit
+if [ ${ACTION} = "push" ]; then
+	scp ${FILE} ${HOST}:${REMOTE_PATH}/${FILE}
+elif [ ${ACTION} = "pull" ]; then
+	scp ${HOST}:${REMOTE_PATH}/${FILE} ${FILE}
+else
+	usage_and_exit
+fi

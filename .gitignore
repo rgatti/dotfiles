@@ -1,0 +1,5 @@
+# default ignore all ssh files
+ssh/**/*
+
+# vim info
+vim/.viminfo

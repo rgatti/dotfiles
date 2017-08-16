@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+#
+# Print line-of-code statistics for CFML files (cfm|cfc).
+# Optionally, the program can read all input from stdin allowing chaining like:
+#  find . -name "*.cf*" | xargs cat | cf-loc -
+#
+import argparse
+import fileinput
+import re
+
+parser = argparse.ArgumentParser(
+	description='count lines of code from cfml files',
+	epilog='Optionally, the program can read all input from stdin allowing chaining like:\n'
+		'find . -name "*.cf*" | xargs cat | cf-loc -')
+parser.add_argument('files', metavar='FILE', nargs='+', help='files to process, - for stdin')
+parser.add_argument('--count-tags', dest='count_tags', action='store_true', help='count the distribution of <cf> tags')
+parser.set_defaults(count_tags=False)
+args = parser.parse_args()
+
+count_tags = {}
+count = { 'lines': 0, 'loc': 0, 'comment': 0, 'blank': 0 }
+regex = {
+	'start_multi': re.compile('^\s*<!---'),
+	'close_multi': re.compile('--->\s*'),
+	'single_line': re.compile('^\s*<!---.+--->\s*$'),
+	'tag': re.compile('<cf([a-z]+)')
+}
+in_multi_comment = False
+
+def is_blank(line):
+	return not in_multi_comment and line == ''
+
+def is_comment(line):
+	global in_multi_comment
+	found = False
+	# if in multi-line comment check for close
+	if in_multi_comment:
+		if regex['close_multi'].search(line):
+			in_multi_comment = False
+	# check for single-line or starting multi-line comment
+	else:
+		if regex['single_line'].search(line):
+			found = True
+		elif regex['start_multi'].search(line):
+			in_multi_comment = True
+			found = True
+	return found
+
+def find_tags(line):
+	for tag in regex['tag'].findall(line):
+		if tag in count_tags:
+			count_tags[tag] += 1
+		else:
+			count_tags[tag] = 1
+
+# process file(s) or stdin
+for line in fileinput.input(files=args.files):
+	line = line.strip()
+	count['lines'] += 1
+	if is_blank(line): count['blank'] += 1
+	elif is_comment(line): count['comment'] += 1
+	else:
+		count['loc'] += 1
+		if args.count_tags: find_tags(line)
+
+# calc ratio
+count['blank_pct'] = count['blank'] / float(count['lines'])
+count['comment_pct'] = count['comment'] / float(count['lines'])
+count['loc_pct'] = count['loc'] / float(count['lines'])
+
+if len(args.files) == 1 and args.files[0] != '-':
+	print('File: {}:'.format(args.files[0]))
+
+print('lines: {lines:,}  blank: {blank:,} ({blank_pct:.2%})  comment: {comment:,} ({comment_pct:.2%})  loc: {loc:,} ({loc_pct:.2%})'
+	.format(**count))
+
+if args.count_tags:
+	print
+	for tag in sorted(count_tags.keys()):
+		print('{0:<22s} {1:,}'.format(tag, count_tags[tag]))
+
+print

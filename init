@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+PKG=${1:-}
+
+for file in $(ls -a ${PKG}); do
+	if [[ "${file}" != "." && "${file}" != ".." ]]; then
+		rm -rf ~/${file}
+	fi
+done
+
+stow ${PKG}

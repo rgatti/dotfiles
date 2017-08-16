@@ -1,0 +1,5 @@
+# Debian dh_make setup
+
+DEBEMAIL=rgatti@getfused.com
+DEBFULLNAME="Robert Gatti"
+export DEBEMAIL DEBFULLNAME

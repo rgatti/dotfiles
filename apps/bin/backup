@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+#
+# A simple script that performs incremental backups using cp and rsync.
+# This script was derived from the tutorial at
+# http://www.mikerubel.org/computers/rsync_snapshots/
+#
+# Robert Gatti
+# Fri, 9 Sep 2016
+
+set -o errexit
+set -o nounset
+
+print_usage_and_exit() {
+	cat <<-EOF
+	Usage: backup [options] SRC DEST
+
+	Make incremental backups of SRC to DEST using cp and rsync.
+
+	[options]
+	  -a <age>     total number of backups to keep (default 5)
+	  -e <device>  mount device using gvfs-mount before running
+	  -z <dir>     directory to exclude (use multiple if needed)
+	EOF
+
+	exit 0
+}
+
+AGE=5
+DEVICE=
+EXCLUDE=
+
+while getopts a:e:n:z: opt; do
+	case $opt in
+		a) AGE=${OPTARG}	;;
+		e) DEVICE=${OPTARG}	;;
+		z) EXCLUDE+="--exclude \"${OPTARG}\" " ;;
+		?) print_usage_and_exit	;;
+		*) print_usage_and_exit	;;
+	esac
+done
+
+# Move $@ index to after getopts parsing.
+shift $(($OPTIND -1))
+[ $# -ne 2 ] && print_usage_and_exit
+SRC=$1
+DEST=${2%/} # Strip trailing slash from dest
+
+# Sanity check that SRC is a directory.
+! [ -d ${SRC} ] && print_usage_and_exit
+
+# Backup folder name.
+BACKUP=$(basename ${SRC})
+TIMESTAMP=$(date +%Y%m%d)
+
+# Make sure source folder has trailing slash for rsync.
+[ "${SRC: -1}" != "/" ] && SRC="${SRC}/"
+
+# Try to mount the required device before running.
+if ! [ -z "${DEVICE}" ]; then
+	echo "Mounting ${DEVICE}"
+	gvfs-mount ${DEVICE}
+fi
+
+# Rotate existing backups
+echo "Rotating backups"
+for i in $(seq ${AGE} -1 1); do
+	if [ -d ${DEST}/${BACKUP}.${i} ]; then
+		echo " ${DEST}/${BACKUP}.${i} --> ${DEST}/${BACKUP}.$((${i} + 1))"
+		mv ${DEST}/${BACKUP}.${i} ${DEST}/${BACKUP}.$((${i} + 1))
+		mv ${DEST}/${BACKUP}.${i}.ts ${DEST}/${BACKUP}.$((${i} + 1)).ts
+	fi
+	cur=${i}
+done
+
+# Remove old backups
+echo "Removing old backups"
+OLD_BACKUPS=$(find ${DEST} -maxdepth 1 -type d -iname "${BACKUP}*" ! -iname "${BACKUP}.[0-${AGE}]")
+for dir in ${OLD_BACKUPS}; do
+	echo " ${dir}"
+	rm -rf ${dir}
+	rm ${dir}.ts
+done
+
+# Perform backup and store timestamp
+echo "Backing up ${SRC} --> ${DEST}/${BACKUP}.0"
+rsync -ax --delete -h --info=progress2 ${EXCLUDE} ${SRC} ${DEST}/${BACKUP}.0
+echo ${TIMESTMP} > ${DEST}/${BACKUP}.0.ts

@@ -1,0 +1,6 @@
+# Global ignore list
+
+# vim
+*~
+*.swp
+*.swo

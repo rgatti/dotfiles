@@ -1,0 +1,11 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =9
+let g:netrw_dirhist_1='/home/rgatti/development/www/bostonprivatebank/com.bostonprivatebank.www/model/form'
+let g:netrw_dirhist_2='/home/rgatti/development/www/bostonprivatebank/com.bostonprivatebank.www/model/form/email'
+let g:netrw_dirhist_3='/home/rgatti/development/www/gfplatform/gfplatform-1_8/cms/assets'
+let g:netrw_dirhist_4='/home/rgatti/development/www/gfplatform/gfplatform-1_8'
+let g:netrw_dirhist_5='/home/rgatti/development/www/gfplatform/gfplatform-1_8/core'
+let g:netrw_dirhist_6='/home/rgatti/development/www/gfplatform/gfplatform-1_8/core/api'
+let g:netrw_dirhist_7='/home/rgatti/ansible-java8/defaults'
+let g:netrw_dirhist_8='/home/rgatti/ansible-java8/tasks'
+let g:netrw_dirhist_9='/home/robert/.dotfiles'
