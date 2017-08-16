@@ -52,8 +52,15 @@ set incsearch		" Incremental search
 set mouse=n		" Enable mouse normal mode only
 set number		" Turn on line numbers
 set textwidth=0		" Disable automatic hard line wrapping
+set autoindent          " Smart indenting
 "set wrap linebreak nolist " Set automatic soft line wrapping
 set nowrap
+" Correct tab settings
+set tabstop=4
+set softtabstop=4
+set shiftwidth=4
+set expandtab
+
 
 " Mark everything past column 80 in a different color
 if (exists('+colorcolumn'))
