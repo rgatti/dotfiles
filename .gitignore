@@ -3,3 +3,4 @@ ssh/**/*
 
 # vim info
 vim/.viminfo
+vim/.vim/plugged
