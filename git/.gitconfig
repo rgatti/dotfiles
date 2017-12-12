@@ -4,6 +4,7 @@
 [core]
 	editor = vim
 	excludesfile = ~/.gitignore_global
+	pager = less -F -X -S
 [push]
 	default = simple
 [alias]
