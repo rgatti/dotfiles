@@ -40,7 +40,7 @@ syntax on
 set t_Co=256		" Set total number of colors (256)
 set background=dark	" Set terminal background
 try
-	colorscheme default
+	colorscheme PaperColor
 catch
 endtry
 
