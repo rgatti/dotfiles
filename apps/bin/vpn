@@ -35,7 +35,7 @@ vpn_start() {
 
 	echo "starting ${VPN}"
 	cd ${CONF_DIR}/${VPN}
-	openvpn --daemon --config ${VPN}.conf --writepid ${PID_FILE}
+	openvpn --daemon --config config.conf --writepid ${PID_FILE}
 	sleep 1
 
 	# Check pid exists
@@ -61,8 +61,12 @@ vpn_stop() {
 
 	echo "stopping ${VPN}"
 	PID=$(<${PID_FILE})
-	kill -HUP ${PID}
-	sleep 1
+
+	# Check pid actually exists
+	if ! test -z $(ps -eo pid | grep ${PID}); then
+		kill -HUP ${PID}
+		sleep 1
+	fi
 
 	# Check pid is gone
 	if ! test -z $(ps -eo pid | grep ${PID}); then
