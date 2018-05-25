@@ -1,6 +1,9 @@
 # default ignore all ssh files
 ssh/**/*
 
+# ignore specific local binaries
+apps/bin/ngrok
+
 # vim info
 vim/.viminfo
 vim/.vim/plugged
