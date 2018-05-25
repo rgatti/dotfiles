@@ -39,6 +39,7 @@ call plug#end()
 syntax on
 set t_Co=256		" Set total number of colors (256)
 set background=dark	" Set terminal background
+set term=screen-256color
 try
 	colorscheme PaperColor
 catch
@@ -61,6 +62,7 @@ set softtabstop=4
 set shiftwidth=4
 set expandtab
 
+autocmd Filetype cf setlocal tabstop=4 softtabstop=4 shiftwidth=4 noexpandtab
 
 " Mark everything past column 80 in a different color
 if (exists('+colorcolumn'))
@@ -83,4 +85,6 @@ map <C-u><C-d> :!pu pull %<CR>
 set laststatus=2			" Show airline statusline
 let g:airline_powerline_fonts = 1 	" Automatically populate the correct glyphs and symbols dictionary
 let g:airline#extensions#tabline#enabled = 1	" Show buffers as tabs
-let g:airline_theme='papercolor'	" Change airline theme
+let g:airline_theme='dark'
+
+set modeline
