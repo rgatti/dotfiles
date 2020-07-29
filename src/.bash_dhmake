@@ -1,3 +1,0 @@
-# debian maintainer settings
-export DEBEMAIL="rgatti@getfused.com"
-export DEBFULLNAME="Robert Gatti"
