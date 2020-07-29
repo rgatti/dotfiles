@@ -1,112 +1,98 @@
-# set umask to the most restrictive
-umask 0077
+alias vi=nvim
+alias vim=nvim
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias ls='ls -CG'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls'
+alias s='cd ~/src'
+alias ..='cd ../'
+alias ...='cd ../..'
 
-# local paths
-export PATH=$PATH:$HOME/.local/bin:$HOME/bin;
-
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
-if ! shopt -oq posix; then
-  if [ -f /usr/share/bash-completion/bash_completion ]; then
-    . /usr/share/bash-completion/bash_completion
-  elif [ -f /etc/bash_completion ]; then
-    . /etc/bash_completion
-  fi
+if which brew > /dev/null; then
+    alias ctags=$(brew --prefix)/bin/ctags
 fi
 
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS
-shopt -s checkwinsize
+# python3 by default
+alias python=python3
+alias pylint=pylint3
+alias pip=pip3
 
-# if set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories
-shopt -s globstar
+f() {
+    local file=${1:-}
+    if [ -z $file ]; then
+        echo "usage: f file"
+    else
+        local files=$(find . -type f -not -path "*/build/*" -iname "*${file}*")
 
+        if [ $(echo "$files" | wc -l) -eq 1 ]; then
+            file=$files
+        else
+            file=$(echo "$files" | fzf)
+        fi
 
-## bash history
-
-# enable history expansion with space
-# e.g. typing !!<space> will replace the !! with your last command
-bind Space:magic-space
-
-# use standard ISO 8601 timestamp
-# %F equivalent to %Y-%m-%d
-# %T equivalent to %H:%M:%S (24-hours format)
-export HISTTIMEFORMAT='%F %T '
-
-# keep history up to date, across sessions, in realtime
-#  http://unix.stackexchange.com/a/48113
-export HISTCONTROL="erasedups:ignoreboth"       # no duplicate entries
-export HISTSIZE=100000                          # big big history (default is 500)
-export HISTFILESIZE=$HISTSIZE                   # big big history
-shopt -s histappend                             # append to history, don't overwrite it
-
-# don't record some commands
-export HISTIGNORE="&:[ ]*:exit:ls:bg:fg:history:clear"
-
-# Save multi-line commands as one command
-shopt -s cmdhist
-
-## custom prompt
-
-# custom git prompt
-function get_git_branch {
-  git branch --no-color 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
-}
-function get_git_status {
-  [ -n "`git status -s 2>/dev/null`" ] && echo '!'
-}
-PS1=" \W\$(get_git_branch)\$(get_git_status) \$ "
-
-# terminal title
-PROMPT_COMMAND='echo -ne "\033]0;$(basename ${PWD})\007"'
-
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# enable color support
-if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-fi
-
-# defaults
-EDITOR=vi               # only real editor
-VISUAL=vi               #
-PAGER='less -S'         # don't wrap long lines
-BROWSER=google-chrome   # resistance is futile
-
-# aliases
-[[ -s "$HOME/.bash_aliases" ]] && . $HOME/.bash_aliases
-
-# debian maintainer
-[[ -s "$HOME/.bash_dhmake" ]] && . $HOME/.bash_dhmake
-
-if [ -d "$HOME/.sdkman" ]; then
-    export SDKMAN_DIR="$HOME/.sdkman"
-    source $HOME/.sdkman/bin/sdkman-init.sh
-fi
-
-# work apps
-[[ -s "$HOME/.gf/bin/gf" ]] && eval "$(~/.gf/bin/gf init -)"
-[[ -s "$HOME/.cms/bin/cms" ]] && eval "$(~/.cms/bin/cms init -)"
-
-# start ssh-agent or connect to an existing one
-#   we want to make sure the *real* ssh-agent is running and not
-#   gnome-keyring
-if ! [ -z "$(env | grep SSH | grep keyring)" ]; then
-    SSH_AUTH_SOCK=""
-fi
-if [ "$SSH_AUTH_SOCK" == "" ]; then
-    [ -f $HOME/.ssh/agent ] && . $HOME/.ssh/agent
-    ssh-add -l &> /dev/null
-    if [ $? -eq 2 ]; then
-        ssh-agent > $HOME/.ssh/agent
-        source $HOME/.ssh/agent > /dev/null
+        echo $file
     fi
-fi
+}
 
-# start tmux
-[ -z "$TMUX" ] && exec tmux -2 -u
+cdf() {
+    local file=${1:-}
+    if [ -z $file ]; then
+        echo "usage: cdf file"
+    else
+        local files=$(find . -type f -not -path "*/build/*" -iname "*${file}*")
 
-# vim: set ts=4 sts=4 sw=4 et :
+        if [ $(echo "$files" | wc -l) -eq 1 ]; then
+            file=$files
+        else
+            file=$(echo "$files" | fzf)
+        fi
+
+        if [ -z "$file" ]; then
+            echo "No match found"
+        else
+            local dir=$(dirname "$file")
+            echo "$dir"
+            pushd $dir > /dev/null
+        fi
+    fi
+}
+
+# wrapper around gradlew that checks if Docker services are required and
+# running
+# NOTE: this should be replaced by the docker-compose plugin https://github.com/avast/gradle-docker-compose-plugin
+g() {
+    if ! [ -z "$(ls docker-compose.yml)" ]; then
+        local prj=$(basename $(pwd))
+        if [ -z "$(docker ps --format "{{.Names}}" | cut -d_ -f1 | sort -u | grep $prj)" ]; then
+            docker-compose up -d
+        fi
+    fi
+    ./gradlew "$@"
+}
+
+# interactive git-checkout with fzf (shift-tab for multi-select)
+co() {
+    local f="$(git status -s | awk '{ print $2 }' | fzf -m --height 10%)"
+    if ! [ -z "$f" ]; then
+        git checkout -- $f
+    fi
+}
+
+# jump to project directory
+p() {
+    local dir=$(ls -1dt ~/src/*/* \
+        | sed -e 's|^'"$HOME"'/src/||' \
+        | fzf --no-sort)
+    if ! [ -z "$dir" ]; then
+        cd "$HOME/src/$dir"
+        ls
+    fi
+}
+
+# local-only settings
+[ -f ~/.bashrc.sensitive ] && . ~/.bashrc.sensitive
+
+# vim: ts=4:sw=4:et
