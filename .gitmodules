@@ -1,0 +1,15 @@
+[submodule "src/.local/share/nvim/site/pack/nerdtree/start/nerdtree"]
+	path = src/.local/share/nvim/site/pack/nerdtree/start/nerdtree
+	url = https://github.com/preservim/nerdtree.git
+[submodule "src/.local/share/nvim/site/pack/vim-bufkill/start/vim-bufkill"]
+	path = src/.local/share/nvim/site/pack/vim-bufkill/start/vim-bufkill
+	url = https://github.com/qpkorr/vim-bufkill.git
+[submodule "src/.local/share/nvim/site/pack/vim-gradle/start/vim-gradle"]
+	path = src/.local/share/nvim/site/pack/vim-gradle/start/vim-gradle
+	url = https://github.com/hdiniz/vim-gradle.git
+[submodule "src/.local/share/nvim/site/pack/vim-solarized8/start/vim-solarized8"]
+	path = src/.local/share/nvim/site/pack/vim-solarized8/start/vim-solarized8
+	url = https://github.com/lifepillar/vim-solarized8.git
+[submodule "src/.local/share/nvim/site/pack/vim-tmux-navigator/start/vim-tmux-navigator"]
+	path = src/.local/share/nvim/site/pack/vim-tmux-navigator/start/vim-tmux-navigator
+	url = https://github.com/christoomey/vim-tmux-navigator.git
