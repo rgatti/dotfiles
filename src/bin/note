@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+set -eu
+
+NOTES_DIR=$HOME/Documents/notes
+
+# Choose note or exit
+note=$((echo "[NEW BLANK]" ; echo "[NEW DATE]" ; ls -1 $NOTES_DIR/${1:-}) \
+    | fzf --no-sort)
+if [ -z "$note" ]; then
+    exit
+fi
+
+# New generic note with date/time
+if [ "$note" == "[NEW DATE]" ]; then
+    note="note_$(date '+%F_%H%M').md"
+
+    if ! [ -f $NOTES_DIR/$note ]; then
+        touch $NOTES_DIR/$note
+    fi
+fi
+
+# New blank note
+if [ "$note" == "[NEW BLANK]" ]; then
+    note=""
+fi
+
+cd $NOTES_DIR ; $EDITOR $note
+
+# Prompt to clean up empty notes
+eval $(stat -s $NOTES_DIR/$note)
+if [ $st_size -eq 0 ]; then
+    while true; do
+		read -p "Delete empty note [yN]? " yn
+		case $yn in
+			[Yy]* ) rm $NOTES_DIR/$note; break;;
+			* ) break;;
+        esac
+    done
+fi

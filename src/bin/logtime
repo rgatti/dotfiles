@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -eu
+DATETIME=$(date "+%F %R")
+NOTE="$@"
+if ! [ -z $NOTE ]; then
+    NOTE=" ${NOTE}"
+fi
+echo "${DATETIME}${NOTE}" >> ~/Documents/notes/timelog
