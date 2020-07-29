@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -eu
+
+if [ -z $EDITOR ]; then
+    echo "$EDITOR not set"
+    exit 1
+fi
+
+name="${1:-}"
+
+if [ -d $name ]; then
+    files=$(find . -type f -not -path "*/build/*")
+else
+    files=$(find . -type f -not -path "*/build/*" -iname "*${name}*")
+fi
+
+if [ $(echo "$files" | wc -l) -eq 1 ]; then
+    file=$files
+else
+    file=$(echo "$files" \
+        | fzf --multi +s --keep-right \
+                --preview='basename {}; echo "-"; head -$LINES {}' \
+                --color='preview-bg:#AABBCC')
+fi
+
+if ! [ -z "$file" ]; then
+    exec $EDITOR $file
+fi
