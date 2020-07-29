@@ -13,6 +13,9 @@ fi
 if ! [ -d ~/.dotfiles ]; then
     echo "Cloning dotfiles"
     git clone https://github.com/rgatti/dotfiles ~/.dotfiles
+    cd ~/.dotfiles
+    git submodule init
+    git submodule update
 fi
 
 echo "Touching default directories"
