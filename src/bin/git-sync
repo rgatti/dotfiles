@@ -1,0 +1,64 @@
+#!/bin/bash
+set -eu
+
+branch=$(git branch --no-color 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+upstream_head=$(git symbolic-ref refs/remotes/upstream/HEAD | cut -d/ -f4)
+origin_head=$(git symbolic-ref refs/remotes/origin/HEAD | cut -d/ -f4)
+stashed_changes=false
+
+if [ -z $branch ]; then
+    echo "No git repository found."
+    exit 1
+fi
+
+if [ "$origin_head" != "$upstream_head" ]; then
+    echo "Head refs don't match, please update your fork"
+    echo "upstream/HEAD != origin/HEAD ... $upstream_head != $origin_head"
+
+    # Offer to fix if either HEAD is empty
+    if [ -z $origin_head ] || [ -z $upstream_head ]; then
+        while true; do
+            read -p "Fix origin and upstream HEADs [Yn]? " yn
+            [ -z $yn ] && yn="y"
+            case $yn in
+                [Yy]* )
+                    git fetch upstream
+                    git remote set-head upstream --auto;
+                    git fetch origin
+                    git remote set-head origin --auto;
+                    exec git sync
+                    break ;
+                    ;;
+                * ) exit 1;;
+            esac
+        done
+    fi
+
+    exit 1
+fi
+
+if [ "$(git status --short)" != "" ]; then
+    echo "Changes found on working branch, stashing"
+    stashed_changes=true
+    git stash
+fi
+
+echo "Synchronizing $origin_head"
+
+if [ $branch != $origin_head ]; then
+    git checkout -q $origin_head
+fi
+
+git fetch -q upstream $upstream_head
+git rebase $upstream_head
+
+if [ $branch != $origin_head ]; then
+    echo "Synchronizing $branch"
+    git checkout -q $branch
+    git rebase $origin_head
+fi
+
+if $stashed_changes; then
+    echo "Restoring stashed changes"
+    git stash pop
+fi
