@@ -50,7 +50,7 @@ if [ $branch != $origin_head ]; then
 fi
 
 git fetch -q upstream $upstream_head
-git rebase $upstream_head
+git rebase upstream/$upstream_head
 
 if [ $branch != $origin_head ]; then
     echo "Synchronizing $branch"
