@@ -1,8 +1,38 @@
 #!/usr/bin/env bash
 set -eu
-DATETIME=$(date "+%F %R")
+
+DATE=$(date "+%F")
+TIME=$(date "+%R")
+
+while getopts ":hd:t:" opt; do
+    case "${opt}" in
+        h ) echo "usage: logtime [-d date] [-t time] [message]"
+            echo "log time to a note"
+            exit ;;
+        d ) DATE=$OPTARG
+            break ;;
+        t )
+            if [ ${#OPTARG} -gt 5 ]; then
+                echo "invalid time format"
+                exit 1
+            fi
+            TIME=$OPTARG
+            if [ ${#TIME} -eq 4 ]; then
+                TIME="0${TIME}"
+            fi
+            break ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+DATETIME="${DATE} ${TIME}"
 NOTE="$@"
-if ! [ -z $NOTE ]; then
+
+if ! [ -z "${NOTE}" ]; then
     NOTE=" ${NOTE}"
 fi
-echo "${DATETIME}${NOTE}" >> ~/Documents/notes/timelog
+
+echo ">$DATETIME<"
+echo ">$NOTE<"
+
+#echo "${DATETIME}${NOTE}" >> ~/Documents/notes/timelog
