@@ -35,4 +35,4 @@ fi
 echo ">$DATETIME<"
 echo ">$NOTE<"
 
-#echo "${DATETIME}${NOTE}" >> ~/Documents/notes/timelog
+echo "${DATETIME}${NOTE}" >> ~/Documents/notes/timelog
