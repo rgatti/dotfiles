@@ -32,7 +32,4 @@ if ! [ -z "${NOTE}" ]; then
     NOTE=" ${NOTE}"
 fi
 
-echo ">$DATETIME<"
-echo ">$NOTE<"
-
 echo "${DATETIME}${NOTE}" >> ~/Documents/notes/timelog
