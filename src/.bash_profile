@@ -11,7 +11,7 @@ export BROWSER=~/bin/browser
 export PATH
 
 # enable bash completions
-[ -f /usr/local/etc/bash_completion ] && source /usr/local/etc/bash_completion
+[[ -r "/usr/local/etc/profile.d/bash_completion.sh" ]] && . "/usr/local/etc/profile.d/bash_completion.sh"
 
 # check window size after each command and, if necessary, update the values of
 # the LINES and COLUMNS
@@ -92,7 +92,9 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 # golang
 if [ -d /usr/local/go ]; then
     PATH=$PATH:/usr/local/go/bin
+    GOPATH=$HOME/Code
     export PATH
+    export GOPATH
 fi
 
 # sdkman
