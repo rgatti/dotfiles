@@ -1,0 +1,9 @@
+# interactive git-checkout with fzf (shift-tab for multi-select)
+co() {
+    local f="$(git status -s | awk '{ print $2 }' | fzf -m --height 10%)"
+    if ! [ -z "$f" ]; then
+        git checkout -- $f
+    fi
+}
+
+# vim: ts=4:sw=4:et:ft=bash

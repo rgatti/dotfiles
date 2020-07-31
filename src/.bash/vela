@@ -1,0 +1,47 @@
+# Useful Vela functions
+
+# List the most recent builds assuming the repo name is the current directory
+builds ()
+{
+    vela get build --repo $(basename $(pwd))
+}
+
+# View the status of the most recent build
+view-build ()
+{
+    vela view build --repo $(basename $(pwd)) -b $(builds | tail -n 1 | cut -f 1)
+}
+
+# View the full log of the last build
+view-log ()
+{
+    local repo=$(basename $(pwd));
+    local build=${1:-};
+    if [ -z "$build" ]; then
+        build=$(builds | tail -n 1 | cut -f 1);
+    fi;
+    vela view log --repo $repo -b $build | less
+}
+
+# View the log of the step that failed in the last build or print all steps if
+# none have failed
+view-step ()
+{
+    local repo=$(basename $(pwd));
+    local org=${1:-$BUILD_ORG};
+    local build=${2:-};
+    local step=${3:-};
+    [ -z "$build" ] && build=$(builds | tail -n 1 | awk '{ print $1 }');
+    [ -z "$step" ] && step=$(vela get step --repo $repo -b $build | awk '/failure/{ print $1 }');
+    if [ -z "$step" ]; then
+        vela get step --repo $repo -b $build;
+    else
+        local addr=$(vela view config | yq -r '.addr');
+        local token=$(vela view config | yq -r '.token');
+        echo "$org/$repo build:$build step:$step";
+        echo;
+        curl -s -X GET -H "Authorization: Bearer $token" "$addr/api/v1/repos/$org/$repo/builds/$build/steps/$step/logs" | jq -r '.data' | base64 -D;
+    fi
+}
+
+# vim: ts=4:sw=4:et:ft=bash

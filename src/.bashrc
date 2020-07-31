@@ -20,6 +20,9 @@ alias python=python3
 alias pylint=pylint3
 alias pip=pip3
 
+# source utility functions
+[ -d ~/.bash ] && for f in ~/.bash/*; do . $f; done
+
 f() {
     local file=${1:-}
     if [ -z $file ]; then
@@ -57,27 +60,6 @@ cdf() {
             echo "$dir"
             pushd $dir > /dev/null
         fi
-    fi
-}
-
-# wrapper around gradlew that checks if Docker services are required and
-# running
-# NOTE: this should be replaced by the docker-compose plugin https://github.com/avast/gradle-docker-compose-plugin
-g() {
-    if ! [ -z "$(ls docker-compose.yml)" ]; then
-        local prj=$(basename $(pwd))
-        if [ -z "$(docker ps --format "{{.Names}}" | cut -d_ -f1 | sort -u | grep $prj)" ]; then
-            docker-compose up -d
-        fi
-    fi
-    ./gradlew "$@"
-}
-
-# interactive git-checkout with fzf (shift-tab for multi-select)
-co() {
-    local f="$(git status -s | awk '{ print $2 }' | fzf -m --height 10%)"
-    if ! [ -z "$f" ]; then
-        git checkout -- $f
     fi
 }
 
