@@ -63,11 +63,13 @@ cdf() {
     fi
 }
 
-# jump to project directory
+# jump to project directory based on structure ~/src/repo/user/project
 p() {
-    local dir=$(ls -1dt ~/src/*/* \
+    local q="${1:-}"
+    ! [ -z $q ] && q="-q $q"
+    local dir=$(ls -1dt ~/src/*/*/* \
         | sed -e 's|^'"$HOME"'/src/||' \
-        | fzf --no-sort)
+        | fzf -1 -0 $q)
     if ! [ -z "$dir" ]; then
         cd "$HOME/src/$dir"
         ls
