@@ -7,22 +7,40 @@ if [ -z $EDITOR ]; then
 fi
 
 name="${1:-}"
+query=""
 
-if [ -d $name ]; then
+if [ -z $name ]; then
     files=$(find . -type f -not -path "*/build/*")
+    #files=$(rg --files --hidden --sort path -g '!build/**' -g '!.git/**')
+elif [ -f $name ]; then
+    files=$name
+elif [ -d $name ]; then
+    files=$(find $name/ -type f -not -path "*/build/*")
+    #files=$(rg --files --hidden --sort path -g '!build/**' -g '!.git/**' $name/)
 else
-    files=$(find . -type f -not -path "*/build/*" -iname "*${name}*")
+    files=$(find . -type f -not -path "*/build/*")
+    #files=$(rg --files --hidden --sort path -g '!build/**' -g '!.git/**')
+    query="-q $name"
 fi
 
-if [ $(echo "$files" | wc -l) -eq 1 ]; then
-    file=$files
-else
-    file=$(echo "$files" \
-        | fzf --multi +s --keep-right \
-                --preview='basename {}; echo "-"; head -$LINES {}' \
-                --color='preview-bg:#AABBCC')
-fi
+files="$(echo "$files" | sed -e 's|\./||')"
 
-if ! [ -z "$file" ]; then
-    exec $EDITOR $file
+selected=$(echo "$files" \
+    | fzf -1 -0 $query \
+        --multi \
+        --keep-right \
+        --preview='basename {}; echo "-"; head -$LINES {}' \
+        --color='preview-bg:#AABBCC')
+
+if ! [ -z "$selected" ]; then
+    cwd=$(pwd)
+    selected=$(echo "$selected" | awk -v cwd="$cwd" '{ print cwd "/" $1 }')
+    first=$(echo "$selected" | head -n 1)
+    project_dir=$(git -C $(dirname $first) rev-parse --show-toplevel 2>/dev/null || true)
+
+    if [ -d $project_dir ]; then
+        cd $project_dir
+    fi
+
+    exec $EDITOR -- $selected
 fi
