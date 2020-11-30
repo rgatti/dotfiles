@@ -1,0 +1,48 @@
+# jump to project
+# usage: p [?][.][..][STR]
+#   ?   print jump history
+#   .   jump last
+#   ..  pop last and jump
+#   STR query string
+p() {
+    local SRC=${SRC:-$HOME/src}
+    local q="${1:-}"
+    touch ~/.jump_history
+
+    if [ "$q" == '?' ]; then
+        cat ~/.jump_history
+        return
+    elif [ "$q" == '.' ]; then
+        cd $(tail -n 1 ~/.jump_history)
+        return
+    elif [ "$q" == '..' ]; then
+        sed -i '' '$d' ~/.jump_history
+        cd $(tail -n 1 ~/.jump_history)
+        return
+    elif ! [ -z "$q" ]; then
+        q="-q $q"
+    fi
+
+    # strip $SRC from paths and feed to fzf
+    # on exactly 0 / 1 match return immediately
+    local dir=$(ls -1dt $SRC/*/*/* \
+        | sed -e 's|^'"$SRC"'/||' \
+        | fzf -1 -0 $q)
+
+    if ! [ -z "$dir" ]; then
+        echo "$SRC/$dir" >> ~/.jump_history
+        cd "$SRC/$dir"
+    fi
+}
+
+# find file and jump to that directory, popd to return
+cdf() {
+    local q="${1:-}"
+    [ -z $q ] && return
+    local file=$(find . -type f -not -path "*/build/*" -iname "*${file}*" \
+        | fzf -1 -0 -q $q)
+    [ -z $file ] && return
+    pushd $(dirname "$file") > /dev/null
+}
+
+# vim: ts=4:sw=4:et:ft=bash

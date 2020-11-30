@@ -1,0 +1,17 @@
+# tear down old compose & bring up docker-compose if available
+up() {
+    touch ~/.docker-compose_history
+    local last=$(cat ~/.docker-compose_history)
+    local cwd=$(pwd)
+    [ -f docker-compose.yml ] || return
+    [ $cwd == $last ] && return
+    if ! [ -z $last ]; then
+        pushd $last
+        docker-compose down -v
+        popd
+    fi
+    pwd > ~/.docker-compose_history
+    docker-compose up -d
+}
+
+# vim: ts=4:sw=4:et:ft=bash

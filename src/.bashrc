@@ -20,61 +20,8 @@ alias python=python3
 alias pylint=pylint3
 alias pip=pip3
 
-# source utility functions
+# utility functions
 [ -d ~/.bash ] && for f in ~/.bash/*; do . $f; done
-
-f() {
-    local file=${1:-}
-    if [ -z $file ]; then
-        echo "usage: f file"
-    else
-        local files=$(find . -type f -not -path "*/build/*" -iname "*${file}*")
-
-        if [ $(echo "$files" | wc -l) -eq 1 ]; then
-            file=$files
-        else
-            file=$(echo "$files" | fzf)
-        fi
-
-        echo $file
-    fi
-}
-
-cdf() {
-    local file=${1:-}
-    if [ -z $file ]; then
-        echo "usage: cdf file"
-    else
-        local files=$(find . -type f -not -path "*/build/*" -iname "*${file}*")
-
-        if [ $(echo "$files" | wc -l) -eq 1 ]; then
-            file=$files
-        else
-            file=$(echo "$files" | fzf)
-        fi
-
-        if [ -z "$file" ]; then
-            echo "No match found"
-        else
-            local dir=$(dirname "$file")
-            echo "$dir"
-            pushd $dir > /dev/null
-        fi
-    fi
-}
-
-# jump to project directory based on structure ~/src/repo/user/project
-p() {
-    local q="${1:-}"
-    ! [ -z $q ] && q="-q $q"
-    local dir=$(ls -1dt ~/src/*/*/* \
-        | sed -e 's|^'"$HOME"'/src/||' \
-        | fzf -1 -0 $q)
-    if ! [ -z "$dir" ]; then
-        cd "$HOME/src/$dir"
-        ls
-    fi
-}
 
 # local-only settings
 [ -f ~/.bashrc.sensitive ] && . ~/.bashrc.sensitive

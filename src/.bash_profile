@@ -3,7 +3,15 @@ umask 0077
 export EDITOR=nvim
 export VISUAL=nvim
 export PAGER='less -S'
-export BROWSER=~/bin/browser
+
+export SRC=$HOME/src
+
+if [ "$(uname -s)" == "Darwin" ]; then
+    export BROWSER="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
+    export PATH="/usr/local/opt/ruby/bin:$PATH"
+else
+    export BROWSER="/usr/bin/firefox"
+fi
 
 # local paths
 [ -d ~/bin ] && PATH=~/bin:$PATH
@@ -69,7 +77,8 @@ _git_prompt_status() {
         echo " (${git_branch}${git_status})"
     fi
 }
-PS1="\[${TERM_BOLD}${TERM_FGCOLOR}\][\!] \w\$(_git_prompt_status) $ \[${TERM_RESET}\] "
+PS1="\[${TERM_BOLD}${TERM_FGCOLOR}\]\w $ \[${TERM_RESET}\] "
+#PS1="\[${TERM_BOLD}${TERM_FGCOLOR}\]\w\$(_git_prompt_status) $ \[${TERM_RESET}\] "
 
 # terminal title
 #PROMPT_COMMAND='echo -ne "\033]0;$(basename ${PWD})\007"'
