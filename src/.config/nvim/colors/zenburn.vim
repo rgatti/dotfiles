@@ -213,7 +213,8 @@ hi Function        guifg=#efef8f
 hi Identifier      guifg=#efdcbc
 hi IncSearch       guibg=#f8f893 guifg=#385f38
 hi Keyword         guifg=#f0dfaf gui=bold
-hi Label           guifg=#dfcfaf gui=underline
+hi Label           guifg=#dfcfaf
+"hi Label           guifg=#dfcfaf gui=underline
 hi Macro           guifg=#ffcfaf gui=bold
 hi ModeMsg         guifg=#ffcfaf gui=none
 hi MoreMsg         guifg=#ffffff gui=bold
@@ -241,9 +242,11 @@ hi Typedef         guifg=#dfe4cf gui=bold
 hi Type            guifg=#dfdfbf gui=bold
 hi Underlined      guifg=#dcdccc gui=underline
 hi VertSplit       guifg=#2e3330 guibg=#688060
-hi VisualNOS       guifg=#333333 guibg=#f18c96 gui=bold,underline
+hi VisualNOS       guifg=#333333 guibg=#f18c96 gui=bold
+"hi VisualNOS       guifg=#333333 guibg=#f18c96 gui=bold,underline
 hi WarningMsg      guifg=#ffffff guibg=#333333 gui=bold
-hi WildMenu        guibg=#2c302d guifg=#cbecd0 gui=underline
+hi WildMenu        guibg=#2c302d guifg=#cbecd0
+"hi WildMenu        guibg=#2c302d guifg=#cbecd0 gui=underline
 
 hi SpellBad   guisp=#bc6c4c guifg=#dc8c6c
 hi SpellCap   guisp=#6c6c9c guifg=#8c8cbc
@@ -273,7 +276,8 @@ if &t_Co > 255
     hi Identifier      ctermfg=223
     hi IncSearch       ctermbg=228   ctermfg=238
     hi Keyword         ctermfg=223   cterm=bold
-    hi Label           ctermfg=187   cterm=underline
+    hi Label           ctermfg=187
+    "hi Label           ctermfg=187   cterm=underline
     hi LineNr          ctermfg=248   ctermbg=233
     hi Macro           ctermfg=223   cterm=bold
     hi ModeMsg         ctermfg=223   cterm=none
