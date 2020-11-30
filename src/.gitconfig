@@ -1,21 +1,19 @@
 [user]
     name = Robert Gatti
-    email = robert.gatti@gmail.com
 [core]
-	excludesfile = ~/.gitignore_global
-	pager = less -F -X -S
+    excludesfile = ~/.gitignore_global
+    pager = "less -F -X -S"
+[remote]
+    # push to the origin (fork) remote by default
+    pushDefault = origin
 [push]
-	default = simple
+    # only push the current branch
+    default = current
 [alias]
-	log-graph = log --graph --first-parent --decorate --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
-	log-graph-all = log --graph --all --decorate --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
-	log-simple = log --oneline --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
-	pp = !sh -c 'git pull && git push'
-    co = checkout
-	br = branch
-	ci = commit -am
-	st = status
-	unstage = reset HEAD --
+    log-graph = log --graph --first-parent --decorate --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
+    log-graph-all = log --graph --all --decorate --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
+    log-simple = log --oneline --abbrev-commit --date=relative --format=format:'%h - (%ar) [%an] %s %d'
+    unstage = reset HEAD --
     last = log -1 HEAD
     wip = !sh -c 'git add . && git commit -am "wip"'
 [credential]
@@ -23,4 +21,14 @@
 [includeIf "gitdir:~/src/"]
     path = ~/src/.gitconfig
 [init]
-	defaultBranch = main
+    defaultBranch = main
+[diff]
+    tool = nvimdiff4
+[difftool]
+    trustExitCode = true
+[merge]
+    tool = nvimdiff4
+    conflictstyle = diff3
+[mergetool "nvimdiff4"]
+    cmd = nvim -d $LOCAL $BASE $REMOTE $MERGED -c '$wincmd w' -c 'wincmd J'
+    trustExitCode = true
